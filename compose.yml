@@ -1,33 +1,72 @@
-version: "3"
+# version: "3"
+
+
+# services:
+#   #name of the service
+#   app:
+#     build: .
+#     ports: 
+#       -8000:8000 # Runnin on port 8000 -> localhost:8000/hits
+#     volumes:
+#       - .:/app # If you change the code, it's live reloading the project
+#       - application-logs:/app/logs/ # Connection with persistent volume defined line 31
+#     networks:
+#       - my-network # Connect to the network bridge defined line 26
+#     environment:
+#       - REDIS_HOST=redis-db # Allow to inject value from outside the container
+#     depends_on:
+#       - redis-db # Waits fot eh redis-db container to be up and running
+  
+#   #name of the second service
+#   redis-db: 
+#     image: "redis:7-alpine" # Based on this image
+#     volumes:
+#       - redis-data:/data # Storing data persistently to the volume defined line 32
+#     networks:
+#       - my-network # Connect to the bridge network line 26
+
+
+# networks:
+#   my-network:
+#     driver: bridge # https://docs.docker.com/engine/network/drivers/
+
+# volumes:
+#   application-logs:
+#   redis-data:
+
 services:
   # Web App in Python
-  web:
+  app:
     build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload  # --reload = live reloading
     ports:
-      - 8081:80 # Runnin on port 8081 -> localhost:8081/hits
+      - "8081:8000"            # localhost:8081 -> container port 8000 (where uvicorn listens)
     volumes:
-      - .:/app # If you change the code, it's live reloading the project
-      - application-logs:/app/logs/ # Connection with persistent volume defined line 31
+      - .:/app                 # Code changes on your PC are seen instantly in the container
+      - application-logs:/app/logs   # Persistent volume for app.log (defined below)
     networks:
-      - my-network # Connect to the network bridge defined line 26
+      - my-network             # Bridge network (defined below)
     environment:
-      - REDIS_HOST=redis-db # Allow to inject value from outside the container
+      - REDIS_HOST=redis-db    # Injected into the app via os.getenv
+      - LOG_DIR=/app/logs      # Where main.py writes app.log
     depends_on:
-      - redis-db # Waits fot eh redis-db container to be up and running
+      - redis-db               # Starts redis-db before web
 
   # The database
-  redis-db: 
-    image: "redis:7-alpine" # Based on this image
+  redis-db:
+    image: "redis:7-alpine"
     volumes:
-      - redis-data:/data # Storing data persistently to the volume defined line 32
+      - redis-data:/data       # Keeps the hit counter after restarts
     networks:
-      - my-network # Connect to the bridge network line 26
+      - my-network
 
 networks:
   my-network:
-    driver: bridge # https://docs.docker.com/engine/network/drivers/
+    driver: bridge
 
 volumes:
   application-logs:
   redis-data:
+
+
 
