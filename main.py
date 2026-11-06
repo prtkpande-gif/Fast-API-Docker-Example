@@ -6,7 +6,7 @@ import logging
 import redis.exceptions
 
 # Loggin setup
-logging.basicConfig(filename='/app/logs/app.log', level=logging.INFO)
+logging.basicConfig(filename='app.log', level=logging.INFO)
 
 #Redis - Reaching another container
 r = None
