@@ -1,0 +1,33 @@
+version: "3"
+services:
+  # Web App in Python
+  web:
+    build: .
+    ports:
+      - 8081:80 # Runnin on port 8081 -> localhost:8081/hits
+    volumes:
+      - .:/app # If you change the code, it's live reloading the project
+      - application-logs:/app/logs/ # Connection with persistent volume defined line 31
+    networks:
+      - my-network # Connect to the network bridge defined line 26
+    environment:
+      - REDIS_HOST=redis-db # Allow to inject value from outside the container
+    depends_on:
+      - redis-db # Waits fot eh redis-db container to be up and running
+
+  # The database
+  redis-db: 
+    image: "redis:7-alpine" # Based on this image
+    volumes:
+      - redis-data:/data # Storing data persistently to the volume defined line 32
+    networks:
+      - my-network # Connect to the bridge network line 26
+
+networks:
+  my-network:
+    driver: bridge # https://docs.docker.com/engine/network/drivers/
+
+volumes:
+  application-logs:
+  redis-data:
+
