@@ -1,72 +1,41 @@
-# version: "3"
-
-
-# services:
-#   #name of the service
-#   app:
-#     build: .
-#     ports: 
-#       -8000:8000 # Runnin on port 8000 -> localhost:8000/hits
-#     volumes:
-#       - .:/app # If you change the code, it's live reloading the project
-#       - application-logs:/app/logs/ # Connection with persistent volume defined line 31
-#     networks:
-#       - my-network # Connect to the network bridge defined line 26
-#     environment:
-#       - REDIS_HOST=redis-db # Allow to inject value from outside the container
-#     depends_on:
-#       - redis-db # Waits fot eh redis-db container to be up and running
-  
-#   #name of the second service
-#   redis-db: 
-#     image: "redis:7-alpine" # Based on this image
-#     volumes:
-#       - redis-data:/data # Storing data persistently to the volume defined line 32
-#     networks:
-#       - my-network # Connect to the bridge network line 26
-
-
-# networks:
-#   my-network:
-#     driver: bridge # https://docs.docker.com/engine/network/drivers/
-
-# volumes:
-#   application-logs:
-#   redis-data:
+version: "3"
 
 services:
-  # Web App in Python
-  app:
+  # Web app in Python
+  web:
     build: .
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload  # --reload = live reloading
     ports:
-      - "8081:8000"            # localhost:8081 -> container port 8000 (where uvicorn listens)
+      - 8000:8000
     volumes:
-      - .:/app                 # Code changes on your PC are seen instantly in the container
-      - application-logs:/app/logs   # Persistent volume for app.log (defined below)
+      - .:/app
+      - application-logs:/app/logs/
     networks:
-      - my-network             # Bridge network (defined below)
+      - my-network
     environment:
-      - REDIS_HOST=redis-db    # Injected into the app via os.getenv
-      - LOG_DIR=/app/logs      # Where main.py writes app.log
+      - REDIS_HOST=redis-db
     depends_on:
-      - redis-db               # Starts redis-db before web
+      - redis-db # waits for redis-db to be up and running
 
-  # The database
   redis-db:
     image: "redis:7-alpine"
     volumes:
-      - redis-data:/data       # Keeps the hit counter after restarts
+      - redis-data:/data
     networks:
       - my-network
-
+    
+  
 networks:
   my-network:
     driver: bridge
-
+  
 volumes:
   application-logs:
   redis-data:
+  
+
+
+
 
 
 

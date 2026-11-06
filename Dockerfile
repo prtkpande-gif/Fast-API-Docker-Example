@@ -1,18 +1,17 @@
-FROM python:3.12-slim
+# Use a slim image of python 3.10
+FROM python:3.10-slim
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install dependencies first (better layer caching)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy app code
+# Copy the project files into the container
 COPY . .
 
-# Log folder inside the container
-ENV LOG_DIR=/app/logs
-RUN mkdir -p /app/logs
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Expose port 8000 to make the application accessible
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Define the command to run the app
+CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000" ]

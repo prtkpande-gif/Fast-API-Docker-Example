@@ -54,14 +54,10 @@ import redis.exceptions
 import os
 import logging
 
-# Logging setup - works locally (./logs) and in Docker (LOG_DIR=/app/logs)
-LOG_DIR = os.getenv("LOG_DIR", "logs")
-os.makedirs(LOG_DIR, exist_ok=True)
-logging.basicConfig(
-    filename=os.path.join(LOG_DIR, "app.log"),
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-)
+import redis.exceptions
+
+# Loggin setup
+logging.basicConfig(filename='app.log', level=logging.INFO)
 
 # Redis - reaching another container
 r = None
